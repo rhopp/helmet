@@ -10,7 +10,7 @@ import (
 func TestNewChartFS(t *testing.T) {
 	g := o.NewWithT(t)
 
-	c := New(os.DirFS("../../installer"))
+	c := New(os.DirFS("../../test"))
 	g.Expect(c).ToNot(o.BeNil())
 
 	t.Run("ReadFile", func(t *testing.T) {
@@ -20,11 +20,10 @@ func TestNewChartFS(t *testing.T) {
 	})
 
 	t.Run("GetChartForDep", func(t *testing.T) {
-		chart, err := c.GetChartFiles("charts/tssc-openshift")
+		chart, err := c.GetChartFiles("charts/helmet-product-a")
 		g.Expect(err).To(o.Succeed())
 		g.Expect(chart).ToNot(o.BeNil())
-		g.Expect(chart.Name()).To(o.Equal("tssc-openshift"))
-		g.Expect(chart.Files).ToNot(o.BeEmpty())
+		g.Expect(chart.Name()).To(o.Equal("helmet-product-a"))
 		g.Expect(chart.Templates).ToNot(o.BeEmpty())
 
 		// Asserting the chart templates are present, it should contain at least a
@@ -33,7 +32,7 @@ func TestNewChartFS(t *testing.T) {
 		for _, tmpl := range chart.Templates {
 			names = append(names, tmpl.Name)
 		}
-		g.Expect(len(names)).To(o.BeNumerically(">", 1))
+		g.Expect(len(names)).To(o.BeNumerically("==", 1))
 		g.Expect(names).To(o.ContainElement("templates/NOTES.txt"))
 	})
 

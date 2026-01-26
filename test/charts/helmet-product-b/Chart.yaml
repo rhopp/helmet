@@ -1,0 +1,8 @@
+apiVersion: v2
+name: helmet-product-b
+description: Product B Service
+version: "1.0.0"
+annotations:
+  helmet.redhat-appstudio.github.com/product-name: "Product B"
+  helmet.redhat-appstudio.github.com/depends-on: helmet-foundation, helmet-operators, helmet-storage
+  helmet.redhat-appstudio.github.com/integrations-provided: quay

@@ -14,7 +14,7 @@ import (
 func TestNewResolver(t *testing.T) {
 	g := o.NewWithT(t)
 
-	cfs := chartfs.New(os.DirFS("../../installer"))
+	cfs := chartfs.New(os.DirFS("../../test"))
 
 	installerNamespace := "test-namespace"
 	cfg, err := config.NewConfigFromFile(cfs, "config.yaml", installerNamespace)
@@ -30,7 +30,6 @@ func TestNewResolver(t *testing.T) {
 	t.Run("Resolve", func(t *testing.T) {
 		topology := NewTopology()
 		r := NewResolver(cfg, c, topology)
-
 		err := r.Resolve()
 		g.Expect(err).To(o.Succeed())
 
@@ -48,39 +47,33 @@ func TestNewResolver(t *testing.T) {
 			t.Logf("(%2d) %s -> %s", i, name, ns)
 			i++
 		}
-		g.Expect(len(dependencySlice)).To(o.Equal(13))
+		g.Expect(len(dependencySlice)).To(o.Equal(10))
 
 		// Validating the order of the resolved dependencies, as well as the
 		// namespace of each dependency.
 		g.Expect(dependencyNamespaceMap).To(o.Equal(map[string]string{
-			"tssc-openshift":      installerNamespace,
-			"tssc-subscriptions":  installerNamespace,
-			"tssc-infrastructure": installerNamespace,
-			"tssc-iam":            installerNamespace,
-			"tssc-tpa":            "tssc-tpa",
-			"tssc-tas":            "tssc-tas",
-			"tssc-pipelines":      installerNamespace,
-			"tssc-gitops":         "tssc-gitops",
-			"tssc-app-namespaces": installerNamespace,
-			"tssc-dh":             "tssc-dh",
-			"tssc-acs":            "tssc-acs",
-			"tssc-acs-test":       "tssc-acs",
-			"tssc-integrations":   installerNamespace,
+			"helmet-product-a":      "helmet-product-a",
+			"helmet-product-b":      "helmet-product-b",
+			"helmet-product-c":      "helmet-product-c",
+			"helmet-product-d":      "helmet-product-d",
+			"helmet-foundation":     installerNamespace,
+			"helmet-operators":      installerNamespace,
+			"helmet-infrastructure": installerNamespace,
+			"helmet-integrations":   installerNamespace,
+			"helmet-networking":     installerNamespace,
+			"helmet-storage":        installerNamespace,
 		}))
 		g.Expect(dependencySlice).To(o.Equal([]string{
-			"tssc-openshift",
-			"tssc-subscriptions",
-			"tssc-acs",
-			"tssc-gitops",
-			"tssc-infrastructure",
-			"tssc-iam",
-			"tssc-tas",
-			"tssc-pipelines",
-			"tssc-tpa",
-			"tssc-app-namespaces",
-			"tssc-dh",
-			"tssc-integrations",
-			"tssc-acs-test",
+			"helmet-foundation",
+			"helmet-operators",
+			"helmet-infrastructure",
+			"helmet-product-a",
+			"helmet-storage",
+			"helmet-product-b",
+			"helmet-integrations",
+			"helmet-networking",
+			"helmet-product-c",
+			"helmet-product-d",
 		}))
 	})
 }

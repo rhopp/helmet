@@ -12,42 +12,42 @@ import (
 func TestNewTopology(t *testing.T) {
 	g := o.NewWithT(t)
 
-	cfs := chartfs.New(os.DirFS("../../installer"))
+	cfs := chartfs.New(os.DirFS("../../test"))
 	g.Expect(cfs).ToNot(o.BeNil())
 
 	ns := "default"
-	openShiftChart, err := cfs.GetChartFiles("charts/tssc-openshift")
+	foundationChart, err := cfs.GetChartFiles("charts/helmet-foundation")
 	g.Expect(err).To(o.Succeed())
-	openShiftDep := NewDependencyWithNamespace(openShiftChart, ns)
+	foundationDep := NewDependencyWithNamespace(foundationChart, ns)
 
-	subscriptionsChart, err := cfs.GetChartFiles("charts/tssc-subscriptions")
+	operatorsChart, err := cfs.GetChartFiles("charts/helmet-operators")
 	g.Expect(err).To(o.Succeed())
-	subscriptionsDep := NewDependencyWithNamespace(subscriptionsChart, ns)
+	operatorsDep := NewDependencyWithNamespace(operatorsChart, ns)
 
-	infrastructureChart, err := cfs.GetChartFiles("charts/tssc-infrastructure")
+	infrastructureChart, err := cfs.GetChartFiles("charts/helmet-infrastructure")
 	g.Expect(err).To(o.Succeed())
 	infrastructureDep := NewDependencyWithNamespace(infrastructureChart, ns)
 
-	iamChart, err := cfs.GetChartFiles("charts/tssc-iam")
+	networkingChart, err := cfs.GetChartFiles("charts/helmet-networking")
 	g.Expect(err).To(o.Succeed())
-	iamDep := NewDependencyWithNamespace(iamChart, ns)
+	networkingDep := NewDependencyWithNamespace(networkingChart, ns)
 
 	topology := NewTopology()
 
 	t.Run("Append", func(t *testing.T) {
-		topology.Append(*iamDep)
+		topology.Append(*networkingDep)
 	})
 
 	t.Run("PrependBefore", func(t *testing.T) {
 		topology.PrependBefore(
-			iamDep.Name(),
-			*openShiftDep,
+			networkingDep.Name(),
+			*foundationDep,
 			*infrastructureDep,
 		)
 	})
 
 	t.Run("AppendAfter", func(t *testing.T) {
-		topology.AppendAfter(openShiftChart.Name(), *subscriptionsDep)
+		topology.AppendAfter(foundationChart.Name(), *operatorsDep)
 	})
 
 	t.Run("GetDependencies", func(t *testing.T) {
@@ -58,10 +58,10 @@ func TestNewTopology(t *testing.T) {
 			names = append(names, d.Name())
 		}
 		g.Expect(names).To(o.Equal([]string{
-			"tssc-openshift",
-			"tssc-subscriptions",
-			"tssc-infrastructure",
-			"tssc-iam",
+			"helmet-foundation",
+			"helmet-operators",
+			"helmet-infrastructure",
+			"helmet-networking",
 		}))
 	})
 }
