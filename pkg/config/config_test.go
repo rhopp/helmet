@@ -12,7 +12,7 @@ import (
 func TestNewConfigFromFile(t *testing.T) {
 	g := o.NewWithT(t)
 
-	cfs := chartfs.New(os.DirFS("../../installer"))
+	cfs := chartfs.New(os.DirFS("../../test"))
 
 	cfg, err := NewConfigFromFile(cfs, "config.yaml", "test-namespace")
 	g.Expect(err).To(o.Succeed())
@@ -34,7 +34,7 @@ func TestNewConfigFromFile(t *testing.T) {
 		_, err := cfg.GetProduct("product1")
 		g.Expect(err).NotTo(o.Succeed())
 
-		product, err := cfg.GetProduct("Developer Hub")
+		product, err := cfg.GetProduct("Product A")
 		g.Expect(err).To(o.Succeed())
 		g.Expect(product).NotTo(o.BeNil())
 		g.Expect(product.GetNamespace()).NotTo(o.BeEmpty())
@@ -82,24 +82,24 @@ func TestNewConfigFromFile(t *testing.T) {
 	})
 
 	t.Run("SetProducts", func(t *testing.T) {
-		// ACS is product 0
-		err := cfg.Set("tssc.products.0.namespace", "acstest")
+		// Product A is product 0
+		err := cfg.Set("tssc.products.0.namespace", "productAtest")
 		g.Expect(err).To(o.Succeed())
 
-		// TPA is product 4
-		err = cfg.Set("tssc.products.4.enabled", false)
+		// Product 2
+		err = cfg.Set("tssc.products.2.enabled", false)
 		g.Expect(err).To(o.Succeed())
 
-		// DH is product 5
-		dhData := map[string]any{
+		// Product D is product 3
+		dData := map[string]any{
 			"catalogURL":   "https://someIP.io",
 			"authProvider": "gitlab",
 		}
-		err = cfg.Set("tssc.products.5.properties", dhData)
+		err = cfg.Set("tssc.products.3.properties", dData)
 		g.Expect(err).To(o.Succeed())
 
 		configString := cfg.String()
-		g.Expect(string(configString)).To(o.ContainSubstring("namespace: acstest"))
+		g.Expect(string(configString)).To(o.ContainSubstring("namespace: productAtest"))
 		g.Expect(string(configString)).To(o.ContainSubstring("enabled: false"))
 		g.Expect(string(configString)).To(o.ContainSubstring("catalogURL: https://someIP.io"))
 		g.Expect(string(configString)).To(o.ContainSubstring("authProvider: gitlab"))
@@ -126,24 +126,24 @@ func TestNewConfigFromFile(t *testing.T) {
 
 	t.Run("SetProduct", func(t *testing.T) {
 		// Get an existing product
-		product, err := cfg.GetProduct("Developer Hub")
+		product, err := cfg.GetProduct("Product D")
 		g.Expect(err).To(o.Succeed())
 		g.Expect(product).NotTo(o.BeNil())
 
 		// Modify it
 		product.Enabled = false
-		newNamespace := "new-dh-namespace"
+		newNamespace := "new-productD-namespace"
 		product.Namespace = &newNamespace
 		product.Properties["catalogURL"] = "http://new.url/catalog.yaml"
 
 		// Call SetProduct
-		err = cfg.SetProduct("Developer Hub", *product)
+		err = cfg.SetProduct("Product D", *product)
 		g.Expect(err).To(o.Succeed())
 
 		// Assert changes
 		configString := cfg.String()
 		g.Expect(configString).To(o.ContainSubstring("enabled: false"))
-		g.Expect(configString).To(o.ContainSubstring("namespace: new-dh-namespace"))
+		g.Expect(configString).To(o.ContainSubstring("namespace: new-productD-namespace"))
 		g.Expect(configString).To(o.ContainSubstring(
 			"catalogURL: http://new.url/catalog.yaml"))
 

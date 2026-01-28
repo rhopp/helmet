@@ -1,0 +1,23 @@
+---
+tssc:
+  settings:
+    crc: false
+    ci:
+      debug: false
+  products:
+    - name: Product A
+      enabled: true
+      namespace: helmet-product-a
+    - name: Product B
+      enabled: true
+      namespace: helmet-product-b
+    - name: Product C
+      enabled: true
+      namespace: helmet-product-c
+    - name: Product D
+      enabled: true
+      namespace: helmet-product-d
+      properties:
+        catalogURL: https://github.com/redhat-appstudio/tssc-dev-multi-ci/blob/pre-release-v1.9.x/samples/all.yaml
+        manageSubscription: true
+        authProvider: oidc

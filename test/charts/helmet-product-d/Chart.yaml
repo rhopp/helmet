@@ -1,0 +1,8 @@
+apiVersion: v2
+name: helmet-product-d
+description: Product D Service
+version: "1.0.0"
+annotations:
+  helmet.redhat-appstudio.github.com/product-name: "Product D"
+  helmet.redhat-appstudio.github.com/depends-on: helmet-foundation, helmet-operators, helmet-infrastructure, helmet-product-b, helmet-product-c
+  helmet.redhat-appstudio.github.com/integrations-required: "quay && nexus"

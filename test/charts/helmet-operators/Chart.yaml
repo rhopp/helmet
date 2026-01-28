@@ -1,0 +1,4 @@
+apiVersion: v2
+name: helmet-operators
+description: Operator Subscriptions
+version: "1.0.0"

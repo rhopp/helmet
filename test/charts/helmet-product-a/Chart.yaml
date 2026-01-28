@@ -1,0 +1,8 @@
+apiVersion: v2
+name: helmet-product-a
+description: Product A Service
+version: "1.0.0"
+annotations:
+  helmet.redhat-appstudio.github.com/product-name: "Product A"
+  helmet.redhat-appstudio.github.com/depends-on: helmet-foundation, helmet-operators, helmet-infrastructure
+  helmet.redhat-appstudio.github.com/integrations-provided: acs

@@ -24,13 +24,13 @@ root:
   {{- $k | nindent 4 }}:
   {{- $v | toYaml | nindent 6 }}
 {{- end }}
-  catalogURL: {{ .Installer.Products.Developer_Hub.Properties.catalogURL }}
+  catalogURL: {{ .Installer.Products.Product_D.Properties.catalogURL }}
 `
 
 func TestEngine_Render(t *testing.T) {
 	g := o.NewWithT(t)
 
-	cfs := chartfs.New(os.DirFS("../../installer"))
+	cfs := chartfs.New(os.DirFS("../../test"))
 
 	cfg, err := config.NewConfigFromFile(cfs, "config.yaml", "test-namespace")
 	g.Expect(err).To(o.Succeed())
@@ -71,7 +71,7 @@ func TestEngine_Render(t *testing.T) {
 	g.Expect(root).To(o.HaveKey("catalogURL"))
 	g.Expect(root["catalogURL"]).NotTo(o.BeNil())
 
-	product, err := cfg.GetProduct(config.DeveloperHub)
+	product, err := cfg.GetProduct("Product D")
 	g.Expect(err).To(o.Succeed())
 	g.Expect(root["catalogURL"]).To(o.Equal(product.Properties["catalogURL"]))
 }

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: helmet-integrations
+description: Integration Configurations
+version: "1.0.0"
+annotations:
+  helmet.redhat-appstudio.github.com/depends-on: helmet-product-a, helmet-product-b
+  helmet.redhat-appstudio.github.com/integrations-required: "acs && quay"

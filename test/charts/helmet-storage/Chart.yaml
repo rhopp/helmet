@@ -1,0 +1,6 @@
+apiVersion: v2
+name: helmet-storage
+description: Storage Configuration
+version: "1.0.0"
+annotations:
+  helmet.redhat-appstudio.github.com/depends-on: helmet-foundation, helmet-operators, helmet-infrastructure

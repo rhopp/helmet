@@ -12,19 +12,19 @@ import (
 func TestNewDependency(t *testing.T) {
 	g := o.NewWithT(t)
 
-	cfs := chartfs.New(os.DirFS("../../installer"))
+	cfs := chartfs.New(os.DirFS("../../test"))
 
-	developerHub, err := cfs.GetChartFiles("charts/tssc-dh")
+	productA, err := cfs.GetChartFiles("charts/helmet-product-a")
 	g.Expect(err).To(o.Succeed())
 
-	d := NewDependency(developerHub)
+	d := NewDependency(productA)
 
 	t.Run("Chart", func(t *testing.T) {
 		g.Expect(d.Chart()).NotTo(o.BeNil())
 	})
 
 	t.Run("Name", func(t *testing.T) {
-		g.Expect(d.Name()).To(o.Equal("tssc-dh"))
+		g.Expect(d.Name()).To(o.Equal("helmet-product-a"))
 	})
 
 	t.Run("Namespace", func(t *testing.T) {
@@ -34,11 +34,11 @@ func TestNewDependency(t *testing.T) {
 	t.Run("DependsOn", func(t *testing.T) {
 		dependsOn := d.DependsOn()
 		g.Expect(len(dependsOn)).To(o.BeNumerically(">", 1))
-		g.Expect(dependsOn[0]).To(o.Equal("tssc-openshift"))
+		g.Expect(dependsOn[0]).To(o.Equal("helmet-foundation"))
 	})
 
 	t.Run("ProductName", func(t *testing.T) {
-		g.Expect(d.ProductName()).To(o.Equal("Developer Hub"))
+		g.Expect(d.ProductName()).To(o.Equal("Product A"))
 	})
 
 	t.Run("UseProductNamespace", func(t *testing.T) {

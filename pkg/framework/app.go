@@ -28,9 +28,9 @@ type App struct {
 	flags              *flags.Flags            // global flags
 	kube               *k8s.Kube               // kubernetes client
 
-	mcpToolsBuilder   mcptools.MCPToolsBuilder // tools builder
-	mcpImage          string                   // installer image
-	installerTarball  []byte                   // embedded installer tarball
+	mcpToolsBuilder  mcptools.MCPToolsBuilder // tools builder
+	mcpImage         string                   // installer image
+	installerTarball []byte                   // embedded installer tarball
 }
 
 // Command exposes the Cobra command.
