@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	"log/slog"
 	"os"
 	"testing"
 
@@ -43,5 +44,26 @@ func TestNewDependency(t *testing.T) {
 
 	t.Run("UseProductNamespace", func(t *testing.T) {
 		g.Expect(d.UseProductNamespace()).To(o.BeEmpty())
+	})
+
+	t.Run("IntegrationsProvided", func(t *testing.T) {
+		// IntegrationsProvided should return a slice (empty or populated)
+		provided := d.IntegrationsProvided()
+		g.Expect(provided).ToNot(o.BeNil())
+	})
+
+	t.Run("IntegrationsRequired", func(t *testing.T) {
+		// IntegrationsRequired should return a string (empty or populated)
+		required := d.IntegrationsRequired()
+		g.Expect(required).To(o.BeAssignableToTypeOf(""))
+	})
+
+	t.Run("LoggerWith", func(t *testing.T) {
+		g := o.NewWithT(t)
+		// Create a basic logger
+		baseLogger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+		decoratedLogger := d.LoggerWith(baseLogger)
+		g.Expect(decoratedLogger).ToNot(o.BeNil())
+		g.Expect(decoratedLogger).ToNot(o.Equal(baseLogger))
 	})
 }

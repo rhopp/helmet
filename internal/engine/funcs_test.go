@@ -133,6 +133,10 @@ func TestToJSON(t *testing.T) {
 			"key2": 123,
 		},
 		expected: `{"key1":"value1","key2":123}`,
+	}, {
+		name:     "unmarshalable value",
+		input:    make(chan int), // channels can't be marshaled to JSON
+		expected: "",
 	}}
 
 	for _, tt := range tests {

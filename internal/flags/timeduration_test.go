@@ -56,3 +56,12 @@ func TestDurationValue_Set(t *testing.T) {
 		})
 	}
 }
+
+func TestDurationValue_Type(t *testing.T) {
+	var duration time.Duration
+	d := NewDurationValue(&duration)
+
+	if d.Type() != "time.Duration" {
+		t.Errorf("DurationValue.Type() = %q, expected %q", d.Type(), "time.Duration")
+	}
+}

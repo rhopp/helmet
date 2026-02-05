@@ -9,6 +9,7 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
+	batchv1client "k8s.io/client-go/kubernetes/typed/batch/v1"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	rbacv1client "k8s.io/client-go/kubernetes/typed/rbac/v1"
 	cmdtesting "k8s.io/kubectl/pkg/cmd/testing"
@@ -27,6 +28,16 @@ func (f *FakeKube) ClientSet(string) (kubernetes.Interface, error) {
 
 func (f *FakeKube) Connected() error {
 	return nil
+}
+
+func (f *FakeKube) BatchV1ClientSet(
+	namespace string,
+) (batchv1client.BatchV1Interface, error) {
+	cs, err := f.ClientSet(namespace)
+	if err != nil {
+		return nil, err
+	}
+	return cs.BatchV1(), nil
 }
 
 func (f *FakeKube) CoreV1ClientSet(
