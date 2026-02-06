@@ -204,6 +204,11 @@ func TestHelm_helmUpgrade(t *testing.T) {
 
 // TestHelm_Deploy tests the Deploy method
 func TestHelm_Deploy(t *testing.T) {
+	// This test requires access to Kubernetes API, skip in CI environments
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test in CI environment (requires Kubernetes cluster)")
+	}
+
 	g := o.NewWithT(t)
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
