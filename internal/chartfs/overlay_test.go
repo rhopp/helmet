@@ -9,7 +9,7 @@ import (
 	o "github.com/onsi/gomega"
 )
 
-// TestNewOverlayFS tests the NewOverlayFS constructor
+// TestNewOverlayFS tests the NewOverlayFS constructor.
 func TestNewOverlayFS(t *testing.T) {
 	g := o.NewWithT(t)
 
@@ -30,7 +30,7 @@ func TestNewOverlayFS(t *testing.T) {
 	g.Expect(overlay.Local).To(o.Equal(fs.FS(local)))
 }
 
-// TestOverlayFSOpen tests the Open method
+// TestOverlayFSOpen tests the Open method.
 func TestOverlayFSOpen(t *testing.T) {
 	// Create test filesystems
 	embedded := fstest.MapFS{
@@ -97,7 +97,7 @@ func TestOverlayFSOpen(t *testing.T) {
 	})
 }
 
-// TestWithEmbeddedBaseDir tests the WithEmbeddedBaseDir method
+// TestWithEmbeddedBaseDir tests the WithEmbeddedBaseDir method.
 func TestWithEmbeddedBaseDir(t *testing.T) {
 	// Create test filesystems with subdirectories
 	embedded := fstest.MapFS{
@@ -152,7 +152,7 @@ func TestWithEmbeddedBaseDir(t *testing.T) {
 	})
 }
 
-// TestOverlayFSWithRealFS tests OverlayFS with real os.DirFS
+// TestOverlayFSWithRealFS tests OverlayFS with real os.DirFS.
 func TestOverlayFSWithRealFS(t *testing.T) {
 	g := o.NewWithT(t)
 
