@@ -375,6 +375,11 @@ func TestHelm_VerifyWithRetry(t *testing.T) {
 
 // TestHelm_GetNotes tests the GetNotes method
 func TestHelm_GetNotes(t *testing.T) {
+	// This test requires access to Kubernetes API, skip in CI environments
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test in CI environment (requires Kubernetes cluster)")
+	}
+
 	g := o.NewWithT(t)
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
@@ -427,6 +432,11 @@ func TestHelm_GetNotes(t *testing.T) {
 
 // TestHelm_VisitReleaseResources tests the VisitReleaseResources method
 func TestHelm_VisitReleaseResources(t *testing.T) {
+	// This test requires access to Kubernetes API, skip in CI environments
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test in CI environment (requires Kubernetes cluster)")
+	}
+
 	g := o.NewWithT(t)
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))

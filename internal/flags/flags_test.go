@@ -184,6 +184,15 @@ func TestFlags_ShowVersion(t *testing.T) {
 func TestNewFlags(t *testing.T) {
 	g := o.NewWithT(t)
 
+	// Unset KUBECONFIG to test default behavior
+	oldKubeConfig := os.Getenv("KUBECONFIG")
+	os.Unsetenv("KUBECONFIG")
+	defer func() {
+		if oldKubeConfig != "" {
+			os.Setenv("KUBECONFIG", oldKubeConfig)
+		}
+	}()
+
 	flags := NewFlags()
 
 	g.Expect(flags).ToNot(o.BeNil())
@@ -193,7 +202,8 @@ func TestNewFlags(t *testing.T) {
 	g.Expect(flags.LogLevel).ToNot(o.BeNil())
 	g.Expect(*flags.LogLevel).To(o.Equal(slog.LevelWarn))
 	g.Expect(flags.Timeout).To(o.Equal(15 * time.Minute))
-	g.Expect(flags.KubeConfigPath).ToNot(o.BeEmpty())
+	// KubeConfigPath should be set to default path when KUBECONFIG is not set
+	g.Expect(flags.KubeConfigPath).To(o.ContainSubstring(".kube/config"))
 }
 
 func TestNewFlags_KubeConfigFromEnv(t *testing.T) {

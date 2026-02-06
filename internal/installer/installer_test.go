@@ -41,6 +41,11 @@ func TestNewInstaller(t *testing.T) {
 
 // TestInstaller_SetValues tests the SetValues method
 func TestInstaller_SetValues(t *testing.T) {
+	// This test requires access to Kubernetes API, skip in CI environments
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test in CI environment (requires Kubernetes cluster)")
+	}
+
 	g := o.NewWithT(t)
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
