@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	"bytes"
 	"os"
 	"testing"
 
@@ -76,5 +77,25 @@ func TestNewResolver(t *testing.T) {
 			"helmet-product-c",
 			"helmet-product-d",
 		}))
+	})
+
+	t.Run("Print", func(t *testing.T) {
+		topology := NewTopology()
+		r := NewResolver(cfg, c, topology)
+		err := r.Resolve()
+		g.Expect(err).To(o.Succeed())
+
+		// Test Print() outputs to writer
+		var buf bytes.Buffer
+		r.Print(&buf)
+		output := buf.String()
+
+		// Verify output contains expected content
+		g.Expect(output).ToNot(o.BeEmpty())
+		g.Expect(output).To(o.ContainSubstring("Index"))
+		g.Expect(output).To(o.ContainSubstring("Dependency"))
+		g.Expect(output).To(o.ContainSubstring("Namespace"))
+		g.Expect(output).To(o.ContainSubstring("Product"))
+		g.Expect(output).To(o.ContainSubstring("helmet-foundation"))
 	})
 }

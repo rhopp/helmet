@@ -63,3 +63,12 @@ func TestLogLevelValue_Set(t *testing.T) {
 		})
 	}
 }
+
+func TestLogLevelValue_Type(t *testing.T) {
+	var level slog.Level
+	l := NewLogLevelValue(&level)
+
+	if l.Type() != "slog.level" {
+		t.Errorf("LogLevelValue.Type() = %q, expected %q", l.Type(), "slog.level")
+	}
+}

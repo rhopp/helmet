@@ -75,3 +75,77 @@ func TestEngine_Render(t *testing.T) {
 	g.Expect(err).To(o.Succeed())
 	g.Expect(root["catalogURL"]).To(o.Equal(product.Properties["catalogURL"]))
 }
+
+// TestEngine_RenderWithInvalidTemplate tests Render with invalid template
+func TestEngine_RenderWithInvalidTemplate(t *testing.T) {
+	g := o.NewWithT(t)
+
+	// Template with invalid syntax
+	invalidTemplate := `{{ .MissingField | invalid }}`
+
+	variables := NewVariables()
+	e := NewEngine(nil, invalidTemplate)
+
+	_, err := e.Render(variables)
+	g.Expect(err).ToNot(o.BeNil())
+}
+
+// TestEngine_RenderWithExecutionError tests Render with template execution error
+func TestEngine_RenderWithExecutionError(t *testing.T) {
+	g := o.NewWithT(t)
+
+	// Template that references non-existent field
+	errorTemplate := `{{ .NonExistent.Field }}`
+
+	variables := NewVariables()
+	e := NewEngine(nil, errorTemplate)
+
+	_, err := e.Render(variables)
+	g.Expect(err).ToNot(o.BeNil())
+}
+
+// TestEngine_RenderEmptyTemplate tests Render with empty template
+func TestEngine_RenderEmptyTemplate(t *testing.T) {
+	g := o.NewWithT(t)
+
+	emptyTemplate := ``
+
+	variables := NewVariables()
+	e := NewEngine(nil, emptyTemplate)
+
+	payload, err := e.Render(variables)
+	g.Expect(err).To(o.BeNil())
+	g.Expect(payload).To(o.BeEmpty())
+}
+
+// TestNewEngine tests the NewEngine constructor
+func TestNewEngine(t *testing.T) {
+	g := o.NewWithT(t)
+
+	templatePayload := "test template"
+	e := NewEngine(nil, templatePayload)
+
+	g.Expect(e).ToNot(o.BeNil())
+	g.Expect(e.templatePayload).To(o.Equal(templatePayload))
+	g.Expect(e.funcMap).ToNot(o.BeNil())
+
+	// Check that custom functions are registered
+	g.Expect(e.funcMap).To(o.HaveKey("toYaml"))
+	g.Expect(e.funcMap).To(o.HaveKey("fromYaml"))
+	g.Expect(e.funcMap).To(o.HaveKey("fromYamlArray"))
+	g.Expect(e.funcMap).To(o.HaveKey("toJson"))
+	g.Expect(e.funcMap).To(o.HaveKey("fromJson"))
+	g.Expect(e.funcMap).To(o.HaveKey("fromJsonArray"))
+	g.Expect(e.funcMap).To(o.HaveKey("required"))
+	g.Expect(e.funcMap).To(o.HaveKey("lookup"))
+}
+
+// TestNewEngineWithNilKube tests NewEngine with nil Kube
+func TestNewEngineWithNilKube(t *testing.T) {
+	g := o.NewWithT(t)
+
+	e := NewEngine(nil, "template")
+	g.Expect(e).ToNot(o.BeNil())
+	g.Expect(e.funcMap).ToNot(o.BeNil())
+	g.Expect(e.funcMap).To(o.HaveKey("lookup"))
+}

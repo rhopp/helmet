@@ -153,4 +153,94 @@ func TestNewConfigFromFile(t *testing.T) {
 		g.Expect(err.Error()).To(o.ContainSubstring(
 			"product \"NonExistentProduct\" not found"))
 	})
+
+	t.Run("Namespace", func(t *testing.T) {
+		namespace := cfg.Namespace()
+		g.Expect(namespace).To(o.Equal("test-namespace"))
+	})
+
+	t.Run("ApplyDefaults", func(t *testing.T) {
+		// ApplyDefaults should propagate the installer namespace to products that don't have one
+		cfg.ApplyDefaults()
+
+		// Verify products have namespaces
+		products := cfg.GetEnabledProducts()
+		for _, product := range products {
+			g.Expect(product.Namespace).ToNot(o.BeNil())
+			g.Expect(*product.Namespace).ToNot(o.BeEmpty())
+		}
+	})
+}
+
+// TestNewConfigFromBytes tests creating config from byte array
+func TestNewConfigFromBytes(t *testing.T) {
+	g := o.NewWithT(t)
+
+	cfs := chartfs.New(os.DirFS("../../test"))
+	configBytes, err := cfs.ReadFile("config.yaml")
+	g.Expect(err).To(o.Succeed())
+
+	cfg, err := NewConfigFromBytes(configBytes, "test-namespace")
+	g.Expect(err).To(o.Succeed())
+	g.Expect(cfg).ToNot(o.BeNil())
+	g.Expect(cfg.Namespace()).To(o.Equal("test-namespace"))
+	g.Expect(cfg.Installer).ToNot(o.BeNil())
+
+	// Test with invalid YAML
+	invalidYAML := []byte("invalid: yaml: content: :")
+	_, err = NewConfigFromBytes(invalidYAML, "test-namespace")
+	g.Expect(err).To(o.HaveOccurred())
+}
+
+// TestNewConfigDefault tests creating default config
+func TestNewConfigDefault(t *testing.T) {
+	g := o.NewWithT(t)
+
+	cfs := chartfs.New(os.DirFS("../../test"))
+
+	cfg, err := NewConfigDefault(cfs, "default-namespace")
+	g.Expect(err).To(o.Succeed())
+	g.Expect(cfg).ToNot(o.BeNil())
+	g.Expect(cfg.Namespace()).To(o.Equal("default-namespace"))
+
+	// Validate that it created a valid config
+	err = cfg.Validate()
+	g.Expect(err).To(o.Succeed())
+}
+
+// TestConvertStringMapToAny tests the conversion utility
+func TestConvertStringMapToAny(t *testing.T) {
+	g := o.NewWithT(t)
+
+	stringMap := map[string]string{
+		"key1": "value1",
+		"key2": "value2",
+	}
+
+	anyMap := ConvertStringMapToAny(stringMap)
+	g.Expect(anyMap).To(o.HaveLen(2))
+	g.Expect(anyMap["key1"]).To(o.Equal("value1"))
+	g.Expect(anyMap["key2"]).To(o.Equal("value2"))
+
+	// Test with empty map
+	emptyMap := ConvertStringMapToAny(map[string]string{})
+	g.Expect(emptyMap).To(o.HaveLen(0))
+}
+
+// TestValidateErrors tests error conditions in Validate
+func TestValidateErrors(t *testing.T) {
+	g := o.NewWithT(t)
+
+	cfs := chartfs.New(os.DirFS("../../test"))
+
+	t.Run("missing_settings", func(t *testing.T) {
+		cfg, err := NewConfigFromFile(cfs, "config.yaml", "test-namespace")
+		g.Expect(err).To(o.Succeed())
+
+		// Clear settings to trigger error
+		cfg.Installer.Settings = nil
+		err = cfg.Validate()
+		g.Expect(err).To(o.HaveOccurred())
+		g.Expect(err.Error()).To(o.ContainSubstring("missing settings"))
+	})
 }

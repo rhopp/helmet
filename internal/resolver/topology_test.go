@@ -64,4 +64,30 @@ func TestNewTopology(t *testing.T) {
 			"helmet-networking",
 		}))
 	})
+
+	t.Run("GetDependency", func(t *testing.T) {
+		// Test finding an existing dependency
+		dep, err := topology.GetDependency("helmet-foundation")
+		g.Expect(err).To(o.Succeed())
+		g.Expect(dep).ToNot(o.BeNil())
+		g.Expect(dep.Name()).To(o.Equal("helmet-foundation"))
+
+		// Test finding a non-existent dependency
+		dep2, err2 := topology.GetDependency("non-existent")
+		g.Expect(err2).To(o.HaveOccurred())
+		g.Expect(dep2).To(o.BeNil())
+	})
+
+	t.Run("Walk", func(t *testing.T) {
+		// Test walking through all dependencies
+		count := 0
+		err := topology.Walk(func(name string, d Dependency) error {
+			count++
+			g.Expect(name).ToNot(o.BeEmpty())
+			g.Expect(d.Name()).To(o.Equal(name))
+			return nil
+		})
+		g.Expect(err).To(o.Succeed())
+		g.Expect(count).To(o.Equal(4))
+	})
 }

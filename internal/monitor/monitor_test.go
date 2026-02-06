@@ -53,6 +53,42 @@ func TestMonitorCollect(t *testing.T) {
 	}
 }
 
+// TestMonitorCollectNilObject tests Collect with nil resource object
+func TestMonitorCollectNilObject(t *testing.T) {
+	g := o.NewWithT(t)
+
+	kube := k8s.NewFakeKube()
+	m := NewMonitor(slog.Default(), kube)
+
+	// Create resource.Info with nil Object
+	resourceInfo := &resource.Info{
+		Name:      "test",
+		Namespace: "default",
+		Object:    nil,
+	}
+
+	err := m.Collect(context.TODO(), resourceInfo)
+	g.Expect(err).To(o.HaveOccurred())
+	g.Expect(err.Error()).To(o.ContainSubstring("resource object is nil"))
+	g.Expect(m.queue).To(o.HaveLen(0))
+}
+
+// TestMonitorNewMonitor tests the NewMonitor constructor
+func TestMonitorNewMonitor(t *testing.T) {
+	g := o.NewWithT(t)
+
+	logger := slog.Default()
+	kube := k8s.NewFakeKube()
+
+	m := NewMonitor(logger, kube)
+
+	g.Expect(m).ToNot(o.BeNil())
+	g.Expect(m.logger).ToNot(o.BeNil())
+	g.Expect(m.kube).To(o.Equal(kube))
+	g.Expect(m.queue).ToNot(o.BeNil())
+	g.Expect(m.queue).To(o.HaveLen(0))
+}
+
 // TestMonitorWatch tests the Monitor's Watch function, which waits for all
 // monitoring functions to complete or until the timeout is reached.
 func TestMonitorWatch(t *testing.T) {

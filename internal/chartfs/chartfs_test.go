@@ -42,4 +42,42 @@ func TestNewChartFS(t *testing.T) {
 		g.Expect(charts).ToNot(o.BeNil())
 		g.Expect(len(charts)).To(o.BeNumerically(">", 1))
 	})
+
+	t.Run("Open", func(t *testing.T) {
+		// Test Open method which implements fs.FS interface
+		file, err := c.Open("config.yaml")
+		g.Expect(err).To(o.Succeed())
+		g.Expect(file).ToNot(o.BeNil())
+		defer file.Close()
+
+		// Verify file info
+		info, err := file.Stat()
+		g.Expect(err).To(o.Succeed())
+		g.Expect(info.Name()).To(o.Equal("config.yaml"))
+		g.Expect(info.IsDir()).To(o.BeFalse())
+	})
+
+	t.Run("WithBaseDir", func(t *testing.T) {
+		// Test WithBaseDir to create a sub-filesystem
+		subFS, err := c.WithBaseDir("charts")
+		g.Expect(err).To(o.Succeed())
+		g.Expect(subFS).ToNot(o.BeNil())
+
+		// Verify we can access files in the sub-filesystem
+		chart, err := subFS.GetChartFiles("helmet-product-a")
+		g.Expect(err).To(o.Succeed())
+		g.Expect(chart).ToNot(o.BeNil())
+		g.Expect(chart.Name()).To(o.Equal("helmet-product-a"))
+	})
+
+	t.Run("WithBaseDir_NestedPath", func(t *testing.T) {
+		// Test WithBaseDir creates a properly scoped filesystem
+		chartsFS, err := c.WithBaseDir("charts")
+		g.Expect(err).To(o.Succeed())
+
+		// Now test getting all charts from the scoped filesystem
+		charts, err := chartsFS.GetAllCharts()
+		g.Expect(err).To(o.Succeed())
+		g.Expect(charts).ToNot(o.BeEmpty())
+	})
 }
